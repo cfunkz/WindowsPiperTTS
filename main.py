@@ -6,7 +6,6 @@ import shutil
 import wave
 from pathlib import Path
 import tkinter.filedialog as filedialog
-
 import customtkinter as ctk
 import numpy as np
 import sounddevice as sd
@@ -304,7 +303,7 @@ for label, var, a, b in [
 btn_row = ctk.CTkFrame(controls, fg_color="transparent")
 btn_row.pack(side="right", padx=10, pady=8)
 
-ctk.CTkButton(btn_row, text="⬇", width=42, height=42, command=export_wav).pack(side="left", padx=(0, 8))
+ctk.CTkButton(btn_row, text="💾", width=42, height=42, command=export_wav).pack(side="left", padx=(0, 8))
 play_btn = ctk.CTkButton(btn_row, text="▶ Play", command=play, width=160, height=42)
 play_btn.pack(side="left")
 
