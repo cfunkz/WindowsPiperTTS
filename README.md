@@ -1,10 +1,6 @@
 # WindowsPiperTTS
 
 <p align="center">
-  <img width="256" height="256" alt="WindowsPiperTTS Logo" src="https://github.com/user-attachments/assets/ea5b6c51-67e9-4515-ae5f-df8d11a6a046" />
-</p>
-
-<p align="center">
   <a href="https://github.com/cfunkz/WindowsPiperTTS/releases">
     <img alt="Downloads" src="https://img.shields.io/github/downloads/cfunkz/WindowsPiperTTS/total?style=for-the-badge" />
   </a>
