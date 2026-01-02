@@ -31,12 +31,14 @@ htmlcov/
 .idea/
 .DS_Store
 
+old/
+# --- Local / scratch files ---
+main_copy.py
+main_good.py
+
 # --- App-specific ---
 models/
 *.onnx
 *.onnx.json
 *.wav
 
-# --- Local / scratch files ---
-main_copy.py
-main_good.py

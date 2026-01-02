@@ -84,7 +84,7 @@ def add_model():
 
 def download_voice():
     dialog = ctk.CTkInputDialog(
-        text="Enter voice id (e.g. en_US-lessac-medium):",
+        text="Enter voice id (e.g. en_GB-cori-high):",
         title="Download Piper Voice",
     )
     voice_id = dialog.get_input()
@@ -163,6 +163,7 @@ def export_wav():
                 length_scale=length.get(),
                 noise_scale=noise.get(),
                 noise_w_scale=noise_w.get(),
+                normalize_audio=bool(normalize_audio.get()),
             )
             with wave.open(out, "wb") as wf:
                 voice.synthesize_wav(text_val, wf, cfg)
@@ -201,6 +202,7 @@ def play():
                 length_scale=length.get(),
                 noise_scale=noise.get(),
                 noise_w_scale=noise_w.get(),
+                normalize_audio=bool(normalize_audio.get()),
             )
             
             buf = io.BytesIO()
@@ -280,6 +282,7 @@ vol = ctk.DoubleVar(value=1.0)
 length = ctk.DoubleVar(value=1.0)
 noise = ctk.DoubleVar(value=0.667)
 noise_w = ctk.DoubleVar(value=0.8)
+normalize_audio = ctk.BooleanVar(value=False)
 
 for label, var, a, b in [
     ("Volume", vol, 0.0, 1.0),
@@ -302,9 +305,11 @@ for label, var, a, b in [
 btn_row = ctk.CTkFrame(controls, fg_color="transparent")
 btn_row.pack(side="right", padx=10, pady=8)
 
+ctk.CTkCheckBox(btn_row, text="Normalize", variable=normalize_audio).pack(side="left", padx=(0, 12))
 ctk.CTkButton(btn_row, text="💾", width=42, height=42, command=export_wav).pack(side="left", padx=(0, 8))
 play_btn = ctk.CTkButton(btn_row, text="▶ Play", command=play, width=160, height=42)
 play_btn.pack(side="left")
+
 
 load_model()
 app.mainloop()
