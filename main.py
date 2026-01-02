@@ -1,10 +1,8 @@
-# file: piper_gui.py
 import io
 import os
 import sys
 import threading
 import shutil
-import tempfile
 import wave
 from pathlib import Path
 import tkinter.filedialog as filedialog
@@ -14,15 +12,11 @@ import numpy as np
 import sounddevice as sd
 from piper import PiperVoice
 from piper.config import SynthesisConfig
-import piper.download_voices as piper_dl  # official downloader module
+import piper.download_voices as piper_dl
 
-try:
-    ## Configure sounddevice defaults
-    sd.default.dtype = "int16"
-    sd.default.blocksize = 0
-    sd.default.latency = "low"
-except Exception as e:
-    print(f"Warning: could not set sounddevice defaults: {e}")
+sd.default.dtype = "int16"
+sd.default.blocksize = 0
+sd.default.latency = "low"
 
 MODELS_DIR = Path(os.getenv("PIPER_MODELS_DIR", "models"))
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -40,10 +34,6 @@ def set_status(text: str):
     status.configure(text=text)
 
 
-def _cfg_path(model_path: Path) -> Path:
-    return model_path.with_suffix(model_path.suffix + ".json")  # .onnx.json
-
-
 def load_model(_=None):
     global voice
     name = model_var.get()
@@ -53,7 +43,7 @@ def load_model(_=None):
         return
 
     model_path = MODELS_DIR / name
-    cfg_path = _cfg_path(model_path)
+    cfg_path = model_path.with_suffix(model_path.suffix + ".json")
     if not cfg_path.exists():
         voice = None
         set_status(f"Missing config: {cfg_path.name}")
@@ -64,15 +54,11 @@ def load_model(_=None):
     def job():
         global voice
         try:
-            try:
-                voice = PiperVoice.load(str(model_path), config_path=str(cfg_path))
-            except TypeError:
-                voice = PiperVoice.load(str(model_path))
+            voice = PiperVoice.load(str(model_path), config_path=str(cfg_path))
             app.after(0, set_status, f"Loaded: {name}")
         except Exception as e:
             voice = None
-            msg = f"Error: {e}"
-            app.after(0, set_status, msg)
+            app.after(0, set_status, f"Error: {e}")
 
     threading.Thread(target=job, daemon=True).start()
 
@@ -104,12 +90,10 @@ def download_voice():
         title="Download Piper Voice",
     )
     voice_id = dialog.get_input()
-    if not voice_id:
-        return
-    voice_id = voice_id.strip()
-    if not voice_id:
+    if not voice_id or not voice_id.strip():
         return
 
+    voice_id = voice_id.strip()
     set_status(f"Downloading {voice_id}…")
 
     def job():
@@ -117,24 +101,21 @@ def download_voice():
         buf = io.StringIO()
         try:
             sys.argv = ["piper.download_voices", voice_id, "--data-dir", str(MODELS_DIR)]
-            sys.stdout = buf
-            sys.stderr = buf
+            sys.stdout = sys.stderr = buf
             try:
                 piper_dl.main()
                 ok = True
             except SystemExit as se:
-                ok = int(se.code or 0) == 0
+                ok = (se.code or 0) == 0
 
             text = buf.getvalue().strip()
             if ok:
-                # Avoid tuple-in-lambda; schedule two callbacks
                 app.after(0, set_status, f"Downloaded: {voice_id}")
                 app.after(0, refresh_models)
             else:
                 app.after(0, set_status, text or f"Download failed: {voice_id}")
         except Exception as e:
-            msg = f"Download error: {e}"
-            app.after(0, set_status, msg)
+            app.after(0, set_status, f"Download error: {e}")
         finally:
             sys.argv, sys.stdout, sys.stderr = argv0, out0, err0
 
@@ -150,7 +131,6 @@ def finish(stopped: bool):
 
 
 def stop_play():
-    global playing
     if not playing:
         return
     stop_event.set()
@@ -158,47 +138,11 @@ def stop_play():
     finish(True)
 
 
-def synth_config():
-    return SynthesisConfig(
-        volume=float(vol.get()),
-        length_scale=float(length.get()),
-        noise_scale=float(noise.get()),
-        noise_w_scale=float(noise_w.get()),
-    )
-
-
-def get_text():
-    return box.get("1.0", "end").strip()
-
-
-def _synthesize_to_wav(path: Path, text_val: str):
-    with wave.open(str(path), "wb") as wf:
-        cfg = synth_config()
-        try:
-            voice.synthesize_wav(text_val, wf, syn_config=cfg)
-        except TypeError:
-            voice.synthesize_wav(text_val, wf, cfg)
-
-
-def _read_wav_i16(path: Path):
-    with wave.open(str(path), "rb") as rf:
-        sr = rf.getframerate()
-        ch = rf.getnchannels()
-        sw = rf.getsampwidth()
-        if sw != 2:
-            raise RuntimeError(f"Unsupported WAV sample width: {sw} (expected 16-bit)")
-        raw = rf.readframes(rf.getnframes())
-    audio = np.frombuffer(raw, dtype=np.int16)
-    if ch > 1:
-        audio = audio.reshape(-1, ch)
-    return audio, sr
-
-
 def export_wav():
     if voice is None:
         set_status("Load a voice model first")
         return
-    text_val = get_text()
+    text_val = box.get("1.0", "end").strip()
     if not text_val:
         set_status("Enter text to speak")
         return
@@ -207,7 +151,7 @@ def export_wav():
         title="Save WAV",
         defaultextension=".wav",
         filetypes=[("WAV audio", "*.wav")],
-        initialfile="voice.wav",
+        initialfile="speech.wav",
     )
     if not out:
         return
@@ -216,14 +160,17 @@ def export_wav():
 
     def worker():
         try:
-            if voice is None:
-                app.after(0, set_status, "Voice model not loaded")
-                return
-            _synthesize_to_wav(Path(out), text_val)
+            cfg = SynthesisConfig(
+                volume=vol.get(),
+                length_scale=length.get(),
+                noise_scale=noise.get(),
+                noise_w_scale=noise_w.get(),
+            )
+            with wave.open(out, "wb") as wf:
+                voice.synthesize_wav(text_val, wf, cfg)
             app.after(0, set_status, f"Saved: {Path(out).name}")
         except Exception as e:
-            msg = f"Error: {e}"
-            app.after(0, set_status, msg)
+            app.after(0, set_status, f"Error: {e}")
 
     threading.Thread(target=worker, daemon=True).start()
 
@@ -238,7 +185,7 @@ def play():
         set_status("Load a voice model first")
         return
 
-    text_val = get_text()
+    text_val = box.get("1.0", "end").strip()
     if not text_val:
         set_status("Enter text to speak")
         return
@@ -250,18 +197,33 @@ def play():
 
     def worker():
         try:
-            if voice is None:
-                app.after(0, set_status, "Voice model not loaded")
-                return
-
-            tmp = Path(tempfile.gettempdir()) / "piper_last.wav"
-            _synthesize_to_wav(tmp, text_val)
+            # Synthesize to memory buffer instead of disk
+            cfg = SynthesisConfig(
+                volume=vol.get(),
+                length_scale=length.get(),
+                noise_scale=noise.get(),
+                noise_w_scale=noise_w.get(),
+            )
+            
+            buf = io.BytesIO()
+            with wave.open(buf, "wb") as wf:
+                voice.synthesize_wav(text_val, wf, cfg)
 
             if stop_event.is_set():
                 app.after(0, finish, True)
                 return
 
-            audio, sr = _read_wav_i16(tmp)
+            # Read from memory buffer
+            buf.seek(0)
+            with wave.open(buf, "rb") as rf:
+                sr = rf.getframerate()
+                raw = rf.readframes(rf.getnframes())
+            
+            audio = np.frombuffer(raw, dtype=np.int16)
+
+            if stop_event.is_set():
+                app.after(0, finish, True)
+                return
 
             app.after(0, set_status, "Playing…")
             sd.play(audio, samplerate=sr, blocking=False)
@@ -269,14 +231,13 @@ def play():
             app.after(0, finish, stop_event.is_set())
         except Exception as e:
             sd.stop()
-            msg = f"Error: {e}"
-            app.after(0, set_status, msg)
+            app.after(0, set_status, f"Error: {e}")
             app.after(0, finish, True)
 
     threading.Thread(target=worker, daemon=True).start()
 
 
-# ---------------- UI ----------------
+# UI
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
@@ -299,7 +260,7 @@ model_menu = ctk.CTkOptionMenu(top, values=list_models(), variable=model_var, co
 model_menu.pack(side="left", padx=6)
 
 ctk.CTkButton(top, text="＋", width=28, command=add_model).pack(side="left", padx=(6, 2))
-ctk.CTkButton(top, text="☁", width=28, command=download_voice).pack(side="left", padx=2)  # auto-download
+ctk.CTkButton(top, text="☁", width=28, command=download_voice).pack(side="left", padx=2)
 ctk.CTkButton(top, text="⟳", width=28, command=refresh_models).pack(side="left", padx=(2, 0))
 
 status = ctk.CTkLabel(top, text="Ready", text_color="gray")
@@ -317,7 +278,7 @@ ctk.CTkLabel(controls, text="Speech Settings", font=("", 12, "bold")).pack(ancho
 settings = ctk.CTkFrame(controls, fg_color="transparent")
 settings.pack(fill="x", padx=8)
 
-vol = ctk.DoubleVar(value=0.9)
+vol = ctk.DoubleVar(value=1.0)
 length = ctk.DoubleVar(value=1.0)
 noise = ctk.DoubleVar(value=0.667)
 noise_w = ctk.DoubleVar(value=0.8)

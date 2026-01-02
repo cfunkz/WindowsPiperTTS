@@ -12,9 +12,9 @@ Add custom models to `/models` folder within root.
 
 ```
 WindowsPiperTTS/
-├─ main.py            # main scrip
+├─ main.py
 ├─ icon.ico
-├─ models/            # create this folder if need to add custom models (or app auto-creates it)
+├─ models/                             # create this
 │  ├─ en_US-lessac-medium.onnx
 │  ├─ en_US-lessac-medium.onnx.json
 │  ├─ en_GB-cori-high.onnx
