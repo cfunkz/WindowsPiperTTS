@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  A Windows application wrapper for PiperTTS with auto-download and installation of models from Hugging Face. Manual model addition, text-to-speech playback, config adjustment, and WAV export.
+  A Windows application wrapper for [PiperTTS](https://github.com/OHF-Voice/piper1-gpl) with auto-download and installation of models from Hugging Face. Manual model addition, text-to-speech playback, config adjustment, and WAV export.
 </p>
 
 > Add custom models to `models/` (in the app folder). folder within root.
