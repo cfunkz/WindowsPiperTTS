@@ -1,7 +1,6 @@
 # WindowsPiperTTS
 
-A Windows application wrapper for PiperTTS with auto-download and installation of models.
-
+A Windows application wrapper for PiperTTS with auto-download and installation of models. Auto-download of voice models from Hugging Face, manual model addition, text-to-speech playback, and WAV export.
 Add custom models to `/models` folder within root.
 
 ## Get voice models manually
@@ -9,6 +8,25 @@ Add custom models to `/models` folder within root.
 - [Piper (official) voice list](https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/VOICES.md)
 - [Hugging Face: rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices/tree/main)
 
+## App Usage
+- Run the `PiperTTS.exe`.
+- Select/download/add model.
+- Enter text in box.
+- Adjust conig (volume, speed, noise, noise_w).
+- Click "▶" for audio or "💾" to export as WAV.
+
+## Development Setup
+- Install Python 3.10+.
+- Install dependencies: `pip install customtkinter piper-tts sounddevice numpy`
+- Clone repo and run main.py.
+
+## Functions
+- `load_model()`: Loads selected ONNX model.
+- `download_voice()`: Downloads model from Hugging Face.
+- `add_model()`: Adds local models to /models.
+- `play()`: Synthesizes and plays audio in a thread.
+- `export_wav()`: Saves synthesized audio to WAV.
+- `refresh_models()`: Updates model list.
 
 ```
 WindowsPiperTTS/
