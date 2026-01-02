@@ -5,7 +5,6 @@ import threading
 import shutil
 import wave
 from pathlib import Path
-import tkinter.filedialog as filedialog
 import customtkinter as ctk
 import numpy as np
 import sounddevice as sd
@@ -71,7 +70,7 @@ def refresh_models():
 
 
 def add_model():
-    files = filedialog.askopenfilenames(
+    files = ctk.filedialog.askopenfilenames(
         title="Select Piper model files",
         filetypes=[("Piper models", "*.onnx *.json"), ("All", "*.*")],
     )
@@ -146,7 +145,7 @@ def export_wav():
         set_status("Enter text to speak")
         return
 
-    out = filedialog.asksaveasfilename(
+    out = ctk.filedialog.asksaveasfilename(
         title="Save WAV",
         defaultextension=".wav",
         filetypes=[("WAV audio", "*.wav")],
