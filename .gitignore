@@ -1,0 +1,42 @@
+# --- Virtual envs ---
+.venv/
+venv/
+env/
+.ENV/
+.python-version
+
+# --- Python cache/bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Build/artifacts ---
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+*.spec
+
+# --- Test/coverage ---
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# --- IDE/editor ---
+.vscode/
+.idea/
+.DS_Store
+
+# --- App-specific ---
+models/
+*.onnx
+*.onnx.json
+*.wav
+
+# --- Local / scratch files ---
+main_copy.py
+main_good.py
