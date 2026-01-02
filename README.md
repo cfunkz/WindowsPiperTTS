@@ -31,7 +31,7 @@
 - [Hugging Face: rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices/tree/main)
 
 ## App Usage
-- Download a [Release](https://github.com/cfunkz/WindowsPiperTTS/releases/)
+- Download:
   - [Single Executable](https://github.com/cfunkz/WindowsPiperTTS/releases/tag/windows-single) (Slow Startup)
   - [Extracted Executable](https://github.com/cfunkz/WindowsPiperTTS/releases/tag/windows) (Instant Startup)
 - Run the `PiperTTS.exe`.
