@@ -32,8 +32,8 @@
 
 ## App Usage
 - Download:
-  - [Single Executable](https://github.com/cfunkz/WindowsPiperTTS/releases/tag/windows-single) (Slow Startup)
-  - [Extracted Executable](https://github.com/cfunkz/WindowsPiperTTS/releases/tag/windows) (Instant Startup)
+  - [Single Executable](https://github.com/cfunkz/WindowsPiperTTS/releases/tag/windows-single) (Not Recommended, Slow Startup)
+  - [Extracted Executable](https://github.com/cfunkz/WindowsPiperTTS/releases/tag/windows) (Recommended, Instant Startup)
 - Run the `PiperTTS.exe`.
 - Select/download/add model.
 - Enter text in box.
