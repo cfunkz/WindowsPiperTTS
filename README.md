@@ -60,7 +60,7 @@ WindowsPiperTTS/
 ```
 
 ### Get voice-models automatically from hugginface.co
-<img width="1149" height="752" alt="image" src="https://github.com/user-attachments/assets/3effab22-918d-49f7-9a0b-ed3efb25b879" />
+<img width="1140" height="752" alt="image" src="https://github.com/user-attachments/assets/bf97bd60-e681-471e-844b-ac46ec4a1f54" />
 
 ### Manually upload voice models
 <img width="1128" height="749" alt="image" src="https://github.com/user-attachments/assets/136f5388-ea27-46b1-bc69-8d464c018b77" />
