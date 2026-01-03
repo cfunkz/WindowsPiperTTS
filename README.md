@@ -1,4 +1,4 @@
-# WindowsPiperTTS
+# tkinterPiperTTS
 
 <p align="center">
   <a href="https://github.com/cfunkz/WindowsPiperTTS/releases">
